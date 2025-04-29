@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: myrails-app-Ingress
+  name: myrails-app-ingress
   namespace: ruby-rails
   labels:
     name: myrails-app-ingress
