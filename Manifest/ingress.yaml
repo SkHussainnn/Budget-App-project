@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myrails-app-Ingress
+  namespace: ruby-rails
+  labels:
+    name: myrails-app-ingress
+spec:
+  rules:
+  - host: simplerailsapp.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: myrails-app
+            port:
+              number: 3000

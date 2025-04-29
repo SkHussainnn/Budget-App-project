@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myrail-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myrail-app
+  template:
+    metadata:
+      labels:
+        app: myrail-app
+    spec:
+      containers:
+      - name: myrail-app
+        image: skhussain786/myrail-app:1.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
