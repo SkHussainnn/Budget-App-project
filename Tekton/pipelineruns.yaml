@@ -10,5 +10,5 @@ spec:
     - name: url
       value: "https://github.com/SkHussainnn/Budget-App-project.git"
     - name: tag
-      value: "sajjany/budget-app:latest"
+      value: "skhussain786/myrail-app:1.0"
   serviceAccountName: pipeline
