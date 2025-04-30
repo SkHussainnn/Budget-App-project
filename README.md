@@ -1,254 +1,152 @@
-![](https://img.shields.io/badge/Microverse-blueviolet)
+# DevOps Assessment
 
-# Budget-App
+This assessment involves deploying a Ruby on Rail application with an Database Postgres SQL using Docker, Kubernetes, ArgoCD and TekTon. Follow the steps below to complete the tasks.
 
+## Step 1: Docker
+### Task
+#### Build a Dockerfile for deploying a simple Ruby on Rails application with PostgreSQL DB  enabled. Application and DB should run on different containers.
 
+### Steps
+1. Create a new Rails application or use an existing one.
+2. Write a Dockerfile to containerize the Rails application.
+   ```Dockerfile
+   FROM ruby:3.1.2
 
-## Description
+   RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
+   RUN gem install bundler:2.3.6
+   ENV BUNDLE_PATH /usr/local/bundle
 
-> The Ruby on Rails capstone project ([remember what they are?](https://github.com/microverseinc/curriculum-html-css/blob/main/articles/capstone_intro.md)) is about building a mobile web application where you can manage your budget: you have a list of transactions associated with a category, so that you can see how much money you spent and on what.
+   WORKDIR /app
+   COPY Gemfile* ./
+   RUN bundle install
 
-- I created a Ruby on Rails application that allows the user to:
+   COPY . .
+   RUN bundle exec rake assets:precompile
+   EXPOSE 3000
 
-  - register and log in, so that the data is private to them.
-  - introduce new transactions associated with a category.
-  - see the money spent on each category.
+   CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
 
-### Screenshots 📸
+3. Write a Dockerfile to run Postgres SQL in it
+   ```Dockerfile-db
+   FROM postgres:13
 
-    Categories
-![](./app/assets/images/img1.png) 
+   ENV POSTGRES_USER=postgres
+   ENV POSTGRES_PASSWORD=postgres
+   ENV POSTGRES_DB=myapp_development
 
-
-    Category-Details 
-![](./app/assets/images/img5.png) 
-
-
-
-## Learning objectives
-
-- Use ruby gems as software packages system.
-- Install Ruby on Rails framework.
-- Understand Rails RESTful design and router.
-- Use controllers to handle requests and render empty views.
-- Use params from browser request in a safe way.
-- Use preprocessed html file with embedded Ruby code.
-- Use layouts and templates for shared content.
-- Use database migration files to maintain database schema.
-- Use validations for models.
-- Secure app from n+1 problems.
-- Understand what ORM is.
-- Write SQL queries with ActiveRecord.
-- Set up associations between models.
-- uild a webapp that requires the user to log in.
-- Use devise gem for authentication.
-- Limit access to webapp resources based on authorization rules.
-- Analyze in writing why you have made a coding choice using one structure over another.
-
-## Live Demo 🔗
-
-[Live Demo Link](https://budgy-budget-api.herokuapp.com/)
-
-## Loom Video 🔗
-
-[Loom Video Link](https://www.loom.com/share/8822f390decc42c2848f3969c4211349)
-
-## Getting Started
-
-To get a local copy for this project and running follow these simple example steps.
-
-### Prerequisites
-
-- You need to have git installed in your machine.
-- Install a recent version of Postgres.
-- Already install Rails
+   EXPOSE 5432
+5. Build Docker container for the Rails application and Postgress and push it on Docker-Hub
+   
+   ```docker build -t sajjany/budget-app:latest .```
+   
+   ```docker build -t sajjany/postgres-sql-image:latest .```
+   
+   ```docker push sajjany/budget-app:latest```
+   
+   ```docker push sajjany/postgres-sql-image:latest```
+   
+7. You can Directly Access the Application by running the Docker Compose file.
+   
+   ```docker-compose up --build```
+   
+   ![image](https://github.com/SajjanYadav/DevOps-Assessment/assets/62510989/a10ce854-a17f-45d3-91b2-6419777d7f3a)
 
 
-## Setup
+## Step 2: Kubernetes
 
-## Setting Up PostgreSQL
-
-- The postgres installation doesn't setup a user for you, so you'll need to follow these steps to create a user with permission to create databases
+### Task
+#### Build a YAML file for the same application you’ve used in your first step to deploy it on Kubernetes. You can use any local cluster provider such as Minikube or K3d. The deployment of the standalone PostgreSQL pod must use Kubernetes StatefulSet. Additionally, the candidate may use any ingress controller they are comfortable with or a service mesh.
 
 ```bash
-$  sudo -u postgres createuser blog-app -s
+Kubectl apply -f manifests/service.yaml      
+Kubectl apply -f manifests/postgres-statefulset.yaml
+Kubectl apply -f manifests/rails-deployment.yaml
+Kubectl apply -f Manifests/Ingress.yaml
 ```
 
-### Creating the Budgy-Budget application
+## Step 3: ArgoCD
+### Task
+#### Deploy ArgoCD to manage the deployment of the previously mentioned application using GitOps. The candidate must create a private GitHub repository to manage the YAML files and for GitOps purposes. All ArgoCD config files must be present in the GitHub repository. The expected files include application.yaml to define the application to deploy, ArgoCD config maps (argocd-cm and argocd-rbac-cm), a config file for/(to add) the private GitHub repository and kubernetes manifest files.
 
-- To create project with PostgreSQL database 
+ArgoCD can be installed using the following commands:
 
+- To create a namespace "argocd", execute the following command. However, this step is optional and you can proceed with the "default" namespace as well:<br>
+  `kubectl create namespace argocd`
+
+- Run the install ArgoCD script by executing the following command: <br>
+  `kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml`
+
+- Install the CLI using brew to use argocd commands: <br>
+  `brew install argocd`
+
+- To retrieve the password, execute the following command: <br>
+  `kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo`
+
+- To access ArgoCD on a browser, forward the port to 8080 by executing the following command: <br>
+ `kubectl port-forward svc/argocd-server -n argocd 8080:443`
+
+- Deployment the YAML configuration
+  - create `argocd` folder which will have our argo-cd configurations which are as follow:
+     - argocd-cm.yaml
+     - argocd-project.yaml
+     - argocd-rbac-cm.yaml
+     - repo-secret.yaml
+  - Now create an `application.yaml` file which will start the argocd server and make the changes accordingly.
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rails-app
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    path: manifests
+    repoURL: https://github.com/SajjanYadav/my-argocd-repo.git
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+![image](https://github.com/SajjanYadav/DevOps-Assessment/assets/62510989/798a3163-28d9-482a-a184-ea3cfef6fd3f)
+
+## Step 4: Tekton
+
+### Task
+Set up Tekton pipelines and the Tekton dashboard. The pipeline should download the source code from the public fork of the sample project (Which you’ve containerized in the first step), build the image, and push it to Docker Hub. The candidate is expected to manually run the pipeline from the Tekton dashboard.
+
+### Steps
+1. Install and configure Tekton on your Kubernetes cluster.
+2. Create Tekton Tasks ([task.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/task.yaml)) for building the application image.
+3. Define a Tekton Pipeline ([build-pipeline.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/pipeline.yaml)) that includes the Task.
+4. Create a PipelineRun ([pipelineruns.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/pipelineruns.yaml)) to trigger the pipeline.
+5. Create a secret ([secret.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/secret.yaml)) for accessing Docker.
+6. Access the Tekton dashboard and manually run the pipeline.
+7. Verify that the source code is downloaded, the image is built, and it is pushed to Docker Hub.
+
+## Working
+
+- Start with installing Tekton
 ```bash
-$   rails new Rails-capstone-Budgy-Budget --database=postgresql  #or
-$   rails new Rails-capstone-Budgy-Budget -d postgresql
-
-$   cd Rails-capstone-Budget-app # Move into the application directory
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 ```
 
-
-### Clone this repository
-
+- Apply the changes
 ```bash
-$ git clone https://github.com/evans22j/Budget-App.git
-$ cd Budget-App
+kubectl apply -f manifests/application.yaml
+kubectl apply -f task.yaml
+kubectl apply -f sercret.yaml
+kubectl apply -f pipeline.yaml
+kubectl apply -f pipelineruns.yaml
 ```
 
-### Create the database
-
+- Run the Pipeline 
 ```bash
-$   rails db:create   # or
-$   rake db:create
+tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SajjanYadav/Budget-App.git --param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/sajjany/budget-app:latest"
 ```
-
-### Install linter and 
-
-- Rubocop gem
-
-```bash
-$  bundle init
-$  bundle install
-```
-- Stylelint package
-
-```bash
-$  npm init -y
-$  npm install
-$  npm install --save-dev stylelint@13.x stylelint-scss@3.x stylelint-config-standard@21.x stylelint-csstree-validator@1.x
-
-```
-
-- Run linter
-
-```bash
-$  rubocop .
-$  npx stylelint "**/*.{css,scss}" 
-```
-
-- In auto-correct mode, RuboCop will try to automatically fix offenses:
-
-```bash
-$  rubocop -A # or
-$  rubocop --auto-correct-all
-$  npx stylelint "**/*.{css,scss}" --fix 
-```
-
-
-### Starting up the Web Server
-
-```bash
-$   rails s # or
-$   rails server # or
-$   rails server -p3001
-```
-
-- To restart the server
-
-```bash
-$  sudo service postgresql restart 
-$  rails db:reset #to clean the database                                                                    
-```
-
-#### Listing Existing Routes
-
-- You can now visit `http://localhost:3000` to view your new website!
-
- You can also execute the `rails routes` command in your terminal to produce the same output.
-
-
-#### Generate rspec
-
-- At the first you need to include those lines in your Gemfile
-
-```bash
-  gem 'rails-controller-testing'
-  gem 'rspec-rails'
-```
-
-#### Install RSpec
-
-```bash
-$  rails generate rspec:install
-```
-- This should generate some files that you will need to run your tests and should give us a Controller and a View
-
-- Then run:
-
-```bash
-$  rspec spec     # to test if your tests are passed
-```
-
-#### Generate MVC with scaffold
-
-```bash
-  $  rails g scaffold category name user:belongs_to
-  $  rails g scaffold records name amount:decimal user:belongs_to 
-  $  rails g scaffold category_records user:belongs_to
-  $  rails g scaffold category_records category:belongs_to record:belongs_to
-```
-
-#### Generate Schema
-
-- To push the Migration into the database
-
-```bash
-  $   rails db:migrate
-```
-- We use the seeds.rb file to records in the database
-- To drop, create a table and to migrate and send the seed into the database:
-
-```bash
-  $   rails db:drop db:create db:migrate db:seed  
-```
-
-- To check available routes
-
-```bash
-  $   rails routes  
-```
-
-#### Run Capybara
-
-```bash
-$  bundle exec rspec ./spec/features/
-```
-
-#### Run spec
-
-```bash
-$  bundle exec rspec ./spec/models/
-```
-
-## Built With 🛠️
-
-This project is build with:
-
--  ![Ruby](https://img.shields.io/badge/-Ruby-000000?style=flat&logo=ruby&logoColor=red)
--  ![Ruby on Rails](https://img.shields.io/badge/-Ruby_on_Rails-000000?style=flat&logo=ruby-on-rails&logoColor=blue)
-
-## Authors
-
-👤 **Evans Sitibekiso**
-
-- GitHub: [@evans22j](https://github.com/evans22j)
-- Twitter: [@Evans_22J](https://twitter.com/Evans_22J)
-- LinkedIn: [@Evans Sitibekiso](https://www.linkedin.com/in/evans-sitibekiso/)
-
-## 🤝 Contributor
-
-
-Contributions, issues, and feature requests are welcome!
-
-Feel free to check the [issues page](https://github.com/evans22j/Budget-App/issues).
-
-## Show your support
-
-Give a ⭐️ if you like this project!
-
-## Acknowledgments
-
-- Credit to [Gregoire Vella on Behance](https://www.behance.net/gregoirevella), the author of the original [design guidelines](https://www.behance.net/gallery/19759151/Snapscan-iOs-design-and-branding?tracking_source=)
-
-
-## 📝 License
-
-This project is [MIT](./MIT.md) licensed.
