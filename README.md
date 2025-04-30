@@ -126,7 +126,7 @@ spec:
 ## Step 4: Tekton
 
 ### Task
-Set up Tekton pipelines and the Tekton dashboard. The pipeline should download the source code from the public fork of the sample project (Which you’ve containerized in the first step), build the image, and push it to Docker Hub. The candidate is expected to manually run the pipeline from the Tekton dashboard.
+Could you set up Tekton pipelines and the Tekton dashboard? The pipeline should download the source code from the public fork of the sample project (Which you’ve containerized in the first step), build the image, and push it to Docker Hub. The candidate is expected to run the pipeline from the Tekton dashboard manually.
 
 ### Steps
 1. Install and configure Tekton on your Kubernetes cluster.
@@ -149,7 +149,7 @@ https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 ```bash
 kubectl apply -f manifests/application.yaml
 kubectl apply -f task.yaml
-kubectl apply -f sercret.yaml
+kubectl apply -f secret.yaml
 kubectl apply -f pipeline.yaml
 kubectl apply -f pipelineruns.yaml
 ```
@@ -157,7 +157,7 @@ kubectl apply -f pipelineruns.yaml
 - Run the Pipeline 
 ```bash
 <<<<<<< HEAD
-tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SajjanYadav/Budget-App.git --param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/sajjany/budget-app:latest"
+tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SkHussainnn/Budget-App-project.git--param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/skhussan786/myrail-app:1.0"
 ```
 =======
 tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SkHussainnn/Budget-App-project.git--param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/skhussan786/myrail-app:1.0"
