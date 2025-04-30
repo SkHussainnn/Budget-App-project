@@ -37,13 +37,13 @@ This assessment involves deploying a Ruby on Rail application with an Database P
    EXPOSE 5432
 5. Build Docker container for the Rails application and Postgress and push it on Docker-Hub
    
-   ```docker build -t sajjany/budget-app:latest .```
+   ```docker build -t skhussain786/myrail-app:1.0 .```
    
-   ```docker build -t sajjany/postgres-sql-image:latest .```
+   ```docker build -t skhussain786/mypostgres-sql-image:latest .```
    
-   ```docker push sajjany/budget-app:latest```
+   ```docker push skhussain786/myrail-app:1.0```
    
-   ```docker push sajjany/postgres-sql-image:latest```
+   ```docker push skhussain786/mypostgres-sql-image:latest```
    
 7. You can Directly Access the Application by running the Docker Compose file.
    
