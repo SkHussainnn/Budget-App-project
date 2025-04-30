@@ -1,0 +1,42 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-and-push
+  namespace: tekton-pipelines-secure
+spec:
+  params:
+    - name: url
+      type: string
+    - name: tag
+      type: string
+  steps:
+    - name: clone-repo
+      image: alpine/git  
+      workingDir: /workspace/source
+      script: |
+        git clone $(params.url) .
+    - name: fix-permissions
+      image: alpine
+      workingDir: /workspace/source
+      script: |
+        chmod -R 777 /workspace/source
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest 
+      env:
+        - name: HOME
+          value: /workspace
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+        runAsUser: 1000
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+      workingDir: /workspace/source
+      args:
+        - --dockerfile=/workspace/source/Dockerfile
+        - --destination=$(params.tag)
+        - --context=.
+        - --single-snapshot  # This flag is added to prevent chown operation errors.

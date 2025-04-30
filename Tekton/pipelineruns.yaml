@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-and-deploy-pipeline-run
+  namespace: tekton-pipelines-secure
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  params:
+    - name: url
+      value: "https://github.com/SkHussainnn/Budget-App-project.git"
+    - name: tag
+      value: "sajjany/budget-app:latest"
+  serviceAccountName: pipeline
