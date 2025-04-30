@@ -39,17 +39,25 @@ This assessment involves deploying a Ruby on Rail application with an Database P
    
    ```docker build -t skhussain786/myrail-app:1.0 .```
    
+<<<<<<< HEAD
    ```docker build -t skhussain786/mypostgres-sql-image:latest .```
    
    ```docker push skhussain786/myrail-app:1.0```
    
    ```docker push skhussain786/mypostgres-sql-image:latest```
+=======
+   ```docker build -t skhussain/mypostgres-sql-image:latest .```
+   
+   ```docker push skhussain786/myrail-app:1.0```
+   
+   ```docker push skhussain/mypostgres-sql-image:latest```
+>>>>>>> 5e1150e (1)
    
 7. You can Directly Access the Application by running the Docker Compose file.
    
    ```docker-compose up --build```
    
-   ![image](https://github.com/SajjanYadav/DevOps-Assessment/assets/62510989/a10ce854-a17f-45d3-91b2-6419777d7f3a)
+   ![image](https://github.com/SkHussainnn/Budget-App-project/assets/62510989/a10ce854-a17f-45d3-91b2-6419777d7f3a)
 
 
 ## Step 2: Kubernetes
@@ -105,7 +113,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     path: manifests
-    repoURL: https://github.com/SajjanYadav/my-argocd-repo.git
+    repoURL: https://github.com/SkHussainnn/Budget-App-project/my-argocd-repo.git
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -113,7 +121,7 @@ spec:
       prune: true
       selfHeal: true
 ```
-![image](https://github.com/SajjanYadav/DevOps-Assessment/assets/62510989/798a3163-28d9-482a-a184-ea3cfef6fd3f)
+![image](https://github.com/SkHussainnn/Budget-App-project/assets/62510989/798a3163-28d9-482a-a184-ea3cfef6fd3f)
 
 ## Step 4: Tekton
 
@@ -122,10 +130,10 @@ Set up Tekton pipelines and the Tekton dashboard. The pipeline should download t
 
 ### Steps
 1. Install and configure Tekton on your Kubernetes cluster.
-2. Create Tekton Tasks ([task.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/task.yaml)) for building the application image.
-3. Define a Tekton Pipeline ([build-pipeline.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/pipeline.yaml)) that includes the Task.
-4. Create a PipelineRun ([pipelineruns.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/pipelineruns.yaml)) to trigger the pipeline.
-5. Create a secret ([secret.yaml](https://github.com/SajjanYadav/DevOps-Assessment/blob/main/manifests/tekton/secret.yaml)) for accessing Docker.
+2. Create Tekton Tasks ([task.yaml](https://github.com/SkHussainnn/Budget-App-project/blob/main/manifests/tekton/task.yaml)) for building the application image.
+3. Define a Tekton Pipeline ([build-pipeline.yaml](https://github.com/SkHussainnn/Budget-App-project/blob/main/manifests/tekton/pipeline.yaml)) that includes the Task.
+4. Create a PipelineRun ([pipelineruns.yaml](https://github.com/SkHussainnn/Budget-App-project/blob/main/manifests/tekton/pipelineruns.yaml)) to trigger the pipeline.
+5. Create a secret ([secret.yaml](https://github.com/SkHussainnn/Budget-App-project/blob/main/manifests/tekton/secret.yaml)) for accessing Docker.
 6. Access the Tekton dashboard and manually run the pipeline.
 7. Verify that the source code is downloaded, the image is built, and it is pushed to Docker Hub.
 
@@ -148,5 +156,10 @@ kubectl apply -f pipelineruns.yaml
 
 - Run the Pipeline 
 ```bash
+<<<<<<< HEAD
 tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SajjanYadav/Budget-App.git --param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/sajjany/budget-app:latest"
 ```
+=======
+tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SkHussainnn/Budget-App-project.git--param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/skhussan786/myrail-app:1.0"
+```
+>>>>>>> 5e1150e (1)
