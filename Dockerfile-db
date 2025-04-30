@@ -1,0 +1,9 @@
+FROM postgres:13
+
+# Set environment variables for PostgreSQL
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV POSTGRES_DB=myapp_development
+
+# Expose the PostgreSQL port
+EXPOSE 5432

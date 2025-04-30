@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    build: 
+      context: .
+      dockerfile: Dockerfile-db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: myapp_development
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: myapp_development
+
+volumes:
+  db-data:
