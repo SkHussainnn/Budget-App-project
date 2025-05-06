@@ -1,13 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: myrails-app-service
-  namespace: ruby-rails
+  name: rails-service
 spec:
   selector:
-    app: myrails-app
+    app: rails
   ports:
-  - protocol: TCP
-    port: 3000
-    targetPort: 3000
-  type: NodePort
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer

@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-deploy-74jpv
+  namespace: tekton-pipelines-secure
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  params:
+    - name: url
+      value: "https://github.com/SkHussainnn/Budget-App-project.git"
+    - name: tag
+      value: "skhussain786/myrail-app:1.0"
+    - name: revision
+      value: "main"
+    - name: IMAGE  # Pass IMAGE parameter here
+      value: "skhussain786/myrail-app:1.0"  # Correct value for the image tag
+  workspaces:
+    - name: source
+      emptyDir: {}  # No PVC, use emptyDir as workspace
+

@@ -1,0 +1,60 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-and-push
+  namespace: tekton-pipelines-secure
+spec:
+  params:
+    - name: url
+      type: string
+    - name: tag
+      type: string
+    - name: revision
+      type: string
+      default: "main"
+
+  workspaces:
+    - name: source
+
+  steps:
+    - name: cleanup-workspace
+      image: alpine
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        echo "Cleaning workspace to prevent git clone conflict..."
+        rm -rf ./* ./.??* || true
+
+    - name: clone-repo
+      image: alpine/git:v2.36.3
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        echo "Cloning repo: $(params.url) at revision: $(params.revision)"
+        git clone --depth=1 --branch $(params.revision) $(params.url) .
+
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:v1.9.0
+      securityContext:
+        runAsNonRoot: false
+      env:
+        - name: DOCKER_CONFIG
+          value: /kaniko/.docker
+      workingDir: $(workspaces.source.path)
+      args:
+        - --dockerfile=Dockerfile
+        - --context=.
+        - --destination=$(params.tag)
+        - --verbosity=info
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: docker-hub-secret
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+

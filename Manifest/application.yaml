@@ -8,8 +8,8 @@ spec:
     namespace: default
     server: https://kubernetes.default.svc
   source:
-    path: manifests
-    repoURL: https://github.com/SkHussainnn/Budget-App-project.git
+    path: Manifest
+    repoURL: https://github.com/SkHussainnn/my-argocd-repo.git
     targetRevision: HEAD
   project: default
   syncPolicy:

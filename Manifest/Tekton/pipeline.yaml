@@ -1,0 +1,46 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy-pipeline
+  namespace: tekton-pipelines-secure
+spec:
+  params:
+    - name: url
+      type: string
+      description: Git repository URL
+      default: "https://github.com/SkHussainnn/Budget-App-project.git"
+    - name: tag
+      type: string
+      description: Docker image tag (registry/repo:version)
+      default: "skhussain786/myrail-app:1.0"
+    - name: revision
+      type: string
+      description: Git branch/tag to checkout
+      default: "main"
+    - name: IMAGE  # Add IMAGE parameter here
+      type: string
+      description: Docker image name to be built and pushed
+
+  workspaces:
+    - name: source
+      description: Workspace for application source code
+
+  tasks:
+    - name: build-and-push
+      taskRef:
+        name: build-and-push
+      params:
+        - name: url
+          value: $(params.url)
+        - name: tag
+          value: $(params.tag)
+        - name: revision
+          value: $(params.revision)
+        - name: IMAGE  # Ensure IMAGE parameter is passed here
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: source
+      retries: 1
+      timeout: "30m"
+
