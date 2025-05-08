@@ -10,11 +10,11 @@ spec:
     - name: url
       value: "https://github.com/SkHussainnn/Budget-App-project.git"
     - name: tag
-      value: "skhussain786/myrail-app:1.0"
+      value: "skhussain786/rails-app:latest"
     - name: revision
       value: "main"
     - name: IMAGE  # Pass IMAGE parameter here
-      value: "skhussain786/myrail-app:1.0"  # Correct value for the image tag
+      value: "skhussain786/rails-app:latest"  # Correct value for the image tag
   workspaces:
     - name: source
       emptyDir: {}  # No PVC, use emptyDir as workspace

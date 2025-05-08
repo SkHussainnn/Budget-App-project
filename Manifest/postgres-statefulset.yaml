@@ -14,9 +14,11 @@ spec:
       labels:
         app: postgres
     spec:
+      securityContext:
+        fsGroup: 999  # PostgreSQL data directory ownership fix
       containers:
       - name: postgres
-        image: skhussain786/my-postgrs-db:1.0  # Update with your image
+        image: postgres:13  # Use official stable image
         ports:
         - containerPort: 5432
         env:
@@ -29,15 +31,6 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          runAsUser: 1001
-          runAsNonRoot: true
-          seccompProfile:
-            type: RuntimeDefault
   volumeClaimTemplates:
   - metadata:
       name: postgres-storage
@@ -47,3 +40,4 @@ spec:
       resources:
         requests:
           storage: 1Gi
+

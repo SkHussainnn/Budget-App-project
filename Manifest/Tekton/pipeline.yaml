@@ -12,7 +12,7 @@ spec:
     - name: tag
       type: string
       description: Docker image tag (registry/repo:version)
-      default: "skhussain786/myrail-app:1.0"
+      default: "skhussain786/rails-app:latest"
     - name: revision
       type: string
       description: Git branch/tag to checkout
