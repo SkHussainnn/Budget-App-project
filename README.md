@@ -163,3 +163,42 @@ tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/Sk
 tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SkHussainnn/Budget-App-project.git--param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/skhussan786/myrail-app:1.0"
 ```
 >>>>>>> 5e1150e (1)
+graph LR
+    %% Define Nodes
+    Dev([👨‍💻 Developer])
+    Git[📂 GitHub Repository<br>Source Code & Manifests]
+    DockerHub[(🐳 Docker Hub<br>Image Registry)]
+    
+    subgraph CI [Continuous Integration - Tekton]
+        Tekton[⚙️ Tekton Pipeline]
+        Build[🏗️ Build Docker Image]
+        Tekton --> Build
+    end
+    
+    subgraph CD [Continuous Deployment - ArgoCD]
+        Argo[🐙 ArgoCD]
+    end
+    
+    subgraph K8s [Kubernetes Cluster]
+        Ingress[🌐 Ingress / Service]
+        Rails[💎 Ruby on Rails<br>Deployment]
+        DB[(🐘 PostgreSQL<br>StatefulSet)]
+        
+        Ingress --> Rails
+        Rails <--> DB
+    end
+
+    %% Define Flow
+    Dev -- 1. Push Code --> Git
+    Git -- 2. Fetch Code --> Tekton
+    Build -- 3. Push Image --> DockerHub
+    
+    Git -- 4. Watch YAMLs --> Argo
+    Argo -- 5. Sync State --> K8s
+    
+    DockerHub -. 6. Pull Image .-> Rails
+
+    %% Styling
+    classDef cluster fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    class K8s,CI,CD cluster;
+
