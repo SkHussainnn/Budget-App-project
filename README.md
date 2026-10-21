@@ -163,6 +163,7 @@ tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/Sk
 tkn pipeline start build-and-push-pipeline --param gitrepo=https://github.com/SkHussainnn/Budget-App-project.git--param context-dir="Ruby_on_rails" --param dockerfile="./Dockerfile" --param docker-image="https://hub.docker.com/r/skhussan786/myrail-app:1.0"
 ```
 >>>>>>> 5e1150e (1)
+```mermaid
 graph LR
     %% Define Nodes
     Dev([👨‍💻 Developer])
@@ -201,4 +202,4 @@ graph LR
     %% Styling
     classDef cluster fill:#f9f9f9,stroke:#333,stroke-width:2px;
     class K8s,CI,CD cluster;
-
+```
